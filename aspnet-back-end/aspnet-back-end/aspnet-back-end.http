@@ -1,6 +1,6 @@
 @aspnet_back_end_HostAddress = http://localhost:5203
 
-GET {{aspnet_back_end_HostAddress}}/weatherforecast/
+GET {{aspnet_back_end_HostAddress}}/closestSuburb/
 Accept: application/json
 
 ###
