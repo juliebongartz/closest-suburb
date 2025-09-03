@@ -6,11 +6,11 @@ namespace aspnet_back_end.Models;
 public class Suburb
 {
     [JsonPropertyName("id")]
-    public int Id { get; set }
+    public int Id { get; set; }
     [JsonPropertyName("suburbName")]
-    public string SuburbName { get; set }
+    public string SuburbName { get; set; }
     [JsonPropertyName("latitude")]
-    public double Latitude { get; set }
+    public double Latitude { get; set; }
     [JsonPropertyName("longitude")]
-    public double Longitude { get; set }
+    public double Longitude { get; set; }
 }
