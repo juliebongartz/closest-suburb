@@ -1,7 +1,8 @@
 import "./App.css";
+import React from "react";
 import { useState } from "react";
 
-const BACKEND = "http://localhost:5174"; // backend url
+const BACKEND = "http://localhost:5174"; // Backend url
 
 type Suburb = {
   id: number,
@@ -10,40 +11,38 @@ type Suburb = {
   longitude: number;
 }
 
-type Closest = {
-  id: number,
-  suburbName: string;
-  latitude: number;
-  longitude: number;
-}
-
 function App() {
-  const [lat, setLat] = useState("");
-  const [longi, setLongi] = useState("");
-  const [closest, setClosest] = useState<Suburb | null>(null); //initially null
+  const [latS, setLatS] = useState(""); 
+  const [longiS, setLongiS] = useState("");
+  const [closest, setClosest] = useState<Suburb | null>(null); // Initially null
   // loading and error states
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
  
 
-  async function onSubmit(e: React.FormEvent)
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>)
   {
     e.preventDefault();
+    setClosest(null) // Reset closest before fetching
     setError(null);
-    setClosestName(null);
-    setClosestDistance(null);
 
-    const latNum = parseFloat(lat); //strinmg to num
-    const longiNum = parseFloat(longi)
+    const lat = parseFloat(latS.trim()); // Convert string states to float
+    const longi = parseFloat(longiS.trim()); // Trim before parsing 
 
-    if (Number.isNaN(latNum) || Number.isNaN(longiNum)) {
-      setError("Please enter numbers");
+    // Validate input is numeric
+    if (Number.isNaN(lat) || Number.isNaN(longi)) {
+      setError("Please enter numbers.");
       return;
     }
-
+    // Validate input in appropriate range
+    if (lat < -90 || lat > 90 || longi < -180 || longi > 180) {
+      setError("Latitude must be between -90 and 90; longitude between -180 and 180.");
+    return;
+    }
+    // Set loading true while fetching
     setLoading(true);
     try {
-      const url = `${BACKEND}/controller`;
+      const url = `${BACKEND}/ClosestSuburbController?lat=${lat}&longi=${longi}`;
       const response = await fetch(url);
     
       const text = await response.text();
@@ -58,14 +57,14 @@ function App() {
       }
 
       if (!text) {
-        setError("None found");
+        setError("No closest suburb found.");
         return;
       }
 
-      const data = JSON.parse(text) as Suburb; // get suburb from backend
+      const data = JSON.parse(text) as Suburb; // Get closest suburb from backend
       setClosest(data);
     } catch (e: any) {
-      setError(e?.message ?? "Errir");
+      setError(e?.message ?? "Unexpected error.");
     } finally {
       setLoading(false);
     }
@@ -75,21 +74,41 @@ function App() {
   return (
   <div>
       <form onSubmit={onSubmit}>
+        <label>
+          Latitude
+          <input
+            type="number"
+            step="any"
+            min={-90}
+            max={90}
+            placeholder="-10"
+            value={latS}
+            onChange={(e) => setLatS(e.target.value)}
+            required
+          />
+        </label>
+        <label>
+          Longitude
+          <input
+            type="number"
+            step="any"
+            min={-180}
+            max={180}
+            placeholder="-10"
+            value={longiS}
+            onChange={(e) => setLongiS(e.target.value)}
+            required
+          />
+        </label>
+        {/* Disable button while request in process */}
+        <button type="submit" disabled={loading}>
+          {loading ? "Finding…" : "Find closest"}
+        </button>
 
-        <input
-          type="number"
-          value={lat}
-          onChange={(e) => setLat(e.target.value)}
-          required
-        />
-
-        <input
-          type="number"
-          value={longi}
-          onChange={(e) => setLongi(e.target.value)}
-          required
-        />
-        <button type="submit">Add</button>
+        {/* Render only when loading, error (alert for readers), closest not null */}
+        {loading && <p>Loading…</p>}
+        {error && <p role="alert">{error}</p>}
+        {closest && <p>{closest.suburbName}</p>}
 
       </form>
 
