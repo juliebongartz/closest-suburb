@@ -46,13 +46,13 @@ Response 200 (application/json)
 }
 ```
 
-Behavior
+### Behavior
 
 Reads and deserializes suburbs.json, then orders suburbs by distance to the input point and returns the closest one. (Current implementation uses Euclidean distance.)
 
 Tip: If calling from a browser app on another origin, enable CORS in the API or run both on the same origin during development.
 
-Frontend usage
+### Frontend usage
 
 Enter latitude and longitude.
 
